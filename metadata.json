@@ -1,0 +1,6 @@
+{
+  "name": "MSA RcGarage Explorer",
+  "description": "Interactive exploded-view visualization of the MSA Competition-Grade Brushless Motor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
