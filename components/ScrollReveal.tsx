@@ -7,15 +7,18 @@ export function ScrollReveal({
   children, 
   delay = 0, 
   className = '',
-  yOffset = 30
+  yOffset = 30,
+  id
 }: { 
   children: React.ReactNode, 
   delay?: number, 
   className?: string,
-  yOffset?: number
+  yOffset?: number,
+  id?: string
 }) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: yOffset }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
