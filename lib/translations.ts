@@ -110,8 +110,8 @@ export const translations = {
     autoRotate: "Putaran Auto",
     explode: "Lerai",
     assemble: "Pasang",
-    zoomIn: "Zum Masuk",
-    zoomOut: "Zum Keluar",
+    zoomIn: "Zoom Masuk",
+    zoomOut: "Zoom Keluar",
   }
 };
 
