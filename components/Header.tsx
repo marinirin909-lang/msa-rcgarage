@@ -51,7 +51,7 @@ export function Header() {
                 className="bg-[#EAB308] hover:bg-[#CA8A04] text-black px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-black transition-all shadow-md shadow-yellow-500/25 active:scale-95 whitespace-nowrap flex items-center gap-2"
              >
                 <ShoppingBag size={16} />
-                <span>{t('purchase')} • Dari RM 119</span>
+                <span>{t('purchase')} • From RM 119</span>
              </button>
 
              <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1 hidden sm:block"></div>
