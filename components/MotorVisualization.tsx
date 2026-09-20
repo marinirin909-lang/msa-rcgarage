@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Info, RotateCcw, Search, ChevronRight } from 'lucide-react';
+import { Info, RotateCcw, Search, ChevronRight, Box, Compass, Play, Pause, Layers, Sliders } from 'lucide-react';
+import { useApp } from './AppProvider';
+import { partsTranslations } from '@/lib/translations';
+import { Motor3DCanvas } from './Motor3DCanvas';
 
 type MotorPart = {
   id: string;
@@ -21,21 +24,21 @@ const PARTS: MotorPart[] = [
   {
     id: 'back-cover',
     name: 'Back Cover',
-    description: 'Precision-machined 6061-T6 aluminum back cover. Features optimized heat dissipation fins and standard M3 mounting holes for secure chassis installation.',
-    features: ['6061-T6 Aluminum', 'CNC Machined', 'Red Anodized'],
-    width: 24,
+    description: 'Precision-machined 6061-T6 aluminum back cover in signature Voltrix Electric Yellow. Features optimized cooling fins and standard M3 mounting patterns.',
+    features: ['6061-T6 Aluminum', 'CNC Machined', 'Electric Yellow Anodized'],
+    width: 26,
     height: 120,
     assembledX: -140,
     explodedX: -360,
     zIndex: 10,
     render: () => (
-      <div className="w-full h-full relative rounded-l-md overflow-hidden bg-gradient-to-b from-red-600 via-red-500 to-red-800 border-r border-red-900 shadow-[inset_2px_0_4px_rgba(255,255,255,0.3),-4px_0_10px_rgba(0,0,0,0.5)]">
-        <div className="absolute top-4 bottom-4 left-1 w-1.5 border-x border-red-900/30 rounded-full bg-red-700/20"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/90 border border-red-900/50 shadow-inner">
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-gray-800 border border-black"></div>
+      <div className="w-full h-full relative rounded-l-md overflow-hidden bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 border-r border-yellow-700 shadow-[inset_2px_0_6px_rgba(255,255,255,0.6),-4px_0_12px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-3 bottom-3 left-1 w-1.5 border-x border-amber-600/50 rounded-full bg-yellow-500/30"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/90 border border-yellow-500/60 shadow-inner flex items-center justify-center">
+           <div className="w-3.5 h-3.5 rounded-full bg-yellow-400/90 border border-yellow-600 shadow-[0_0_6px_rgba(250,204,21,0.6)]"></div>
         </div>
-        <div className="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-yellow-600/80 shadow-[0_0_2px_rgba(255,215,0,0.5)]"></div>
-        <div className="absolute bottom-3 left-3 w-1.5 h-1.5 rounded-full bg-yellow-600/80 shadow-[0_0_2px_rgba(255,215,0,0.5)]"></div>
+        <div className="absolute top-3 left-2.5 w-1.5 h-1.5 rounded-full bg-zinc-900 border border-yellow-600 shadow-inner"></div>
+        <div className="absolute bottom-3 left-2.5 w-1.5 h-1.5 rounded-full bg-zinc-900 border border-yellow-600 shadow-inner"></div>
       </div>
     )
   },
@@ -50,7 +53,7 @@ const PARTS: MotorPart[] = [
     explodedX: -260,
     zIndex: 20,
     render: () => (
-      <div className="w-full h-full bg-gradient-to-b from-gray-300 via-white to-gray-500 rounded-sm border-x border-gray-400 flex items-center justify-center shadow-md">
+      <div className="w-full h-full bg-gradient-to-b from-gray-200 via-white to-gray-500 rounded-sm border-x border-gray-400 flex items-center justify-center shadow-md">
         <div className="w-4 h-full bg-gradient-to-b from-gray-400 via-gray-200 to-gray-600 border-x border-gray-500/50 rounded-[1px]"></div>
       </div>
     )
@@ -58,24 +61,36 @@ const PARTS: MotorPart[] = [
   {
     id: 'shell',
     name: 'Stator Shell',
-    description: 'CNC machined billet aluminum heatsink can. Designed for maximum heat dissipation and structural integrity to protect internal components.',
-    features: ['Billet Aluminum', 'Laser Etched', 'Maximum Cooling'],
+    description: 'CNC machined billet aluminum heatsink can finished in stealth graphite with laser-etched Voltrix speedlines and electric yellow accents.',
+    features: ['Billet Aluminum Can', 'Voltrix Laser Etched', 'Electric Yellow Accents'],
     width: 170,
     height: 124,
     assembledX: -50,
     explodedX: -130,
     zIndex: 30,
     render: () => (
-      <div className="w-full h-full relative rounded-sm bg-gradient-to-b from-gray-800 via-[#1f2023] to-black shadow-2xl overflow-hidden border-y border-gray-600/30 border-x border-black">
-         {/* Highlight on top */}
-         <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/10 to-transparent"></div>
-         {/* MSA Branding */}
-         <div className="absolute inset-0 flex flex-col items-center justify-center mix-blend-screen opacity-90 pb-2">
-            <span className="text-white font-black text-2xl tracking-[0.2em] italic mb-1">MSA</span>
-            <div className="flex gap-2 text-[10px] text-gray-300 tracking-wider font-mono">
-              <span className="border border-white/30 px-1">2940-7T</span>
-              <span>8330KV</span>
+      <div className="w-full h-full relative rounded-sm bg-gradient-to-b from-[#22242a] via-[#121316] to-[#07080a] shadow-2xl overflow-hidden border-y border-yellow-500/40 border-x border-black">
+         <div className="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-white/15 to-transparent"></div>
+         <div className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 border-r border-yellow-700"></div>
+         <div className="absolute top-0 bottom-0 right-0 w-2 bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 border-l border-yellow-700"></div>
+         
+         <div className="absolute inset-0 flex flex-col items-center justify-center select-none px-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <svg className="w-5 h-5 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13 2L3 14h8l-2 8 11-13h-8l3-7z" />
+              </svg>
+              <span className="text-yellow-400 font-black text-2xl tracking-[0.22em] italic drop-shadow-[0_0_10px_rgba(250,204,21,0.4)]">
+                VOLTRIX
+              </span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] text-yellow-300/90 font-mono tracking-widest uppercase border border-yellow-400/40 bg-yellow-950/40 px-1.5 py-0.5 rounded">
+                POWER YOU CAN FEEL
+              </span>
+            </div>
+            <span className="text-[8px] text-gray-400 font-mono tracking-[0.2em] mt-1">
+              2940 SERIES • BRUSHLESS
+            </span>
          </div>
       </div>
     )
@@ -83,8 +98,8 @@ const PARTS: MotorPart[] = [
   {
     id: 'coil',
     name: 'Vortex Coil',
-    description: 'High-purity copper windings maximizing conductivity and efficiency. Designed to withstand high-temperature competition use without performance degradation.',
-    features: ['High-Purity Copper', 'High-Temp Rating', 'Hand-Wound Precision'],
+    description: 'High-purity oxygen-free copper windings maximizing electrical conductivity and efficiency under intense competition loads.',
+    features: ['High-Purity Copper', '200°C High-Temp Rating', 'Precision Hand-Wound'],
     width: 150,
     height: 104,
     assembledX: -40,
@@ -92,15 +107,12 @@ const PARTS: MotorPart[] = [
     zIndex: 40,
     render: () => (
       <div className="w-full h-full relative bg-gradient-to-b from-[#7A3610] via-[#CD6722] to-[#4A1E06] rounded-sm border-y border-[#3E1F07] shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)] overflow-hidden">
-         {/* Coil texture */}
          <div className="absolute inset-0 flex">
             {[...Array(40)].map((_, i) => (
               <div key={i} className="flex-1 h-full border-r border-[#3E1F07]/40 mix-blend-multiply"></div>
             ))}
          </div>
-         {/* Top specular highlight */}
          <div className="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-white/20 to-transparent"></div>
-         {/* End caps */}
          <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-b from-gray-400 via-gray-300 to-gray-600 border-r border-gray-500"></div>
          <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-b from-gray-400 via-gray-300 to-gray-600 border-l border-gray-500"></div>
       </div>
@@ -109,7 +121,7 @@ const PARTS: MotorPart[] = [
   {
     id: 'gasket',
     name: 'Precision Gasket',
-    description: 'High-tolerance spacer ring to maintain optimal clearance and prevent lateral play in the rotor assembly, ensuring consistent magnetic flux.',
+    description: 'High-tolerance spacer ring to maintain optimal magnetic clearance and prevent axial play in the rotor assembly.',
     features: ['Brass Alloy', 'Micrometer Tolerance', 'Anti-Vibration'],
     width: 6,
     height: 48,
@@ -123,7 +135,7 @@ const PARTS: MotorPart[] = [
   {
     id: 'rotor',
     name: 'Explosion-Proof Rotor',
-    description: 'High-strength, precision-balanced 4-pole rotor. Features Kevlar wrapping to prevent expansion and catastrophic failure at extreme RPMs.',
+    description: 'Dynamic balanced 4-pole Neodymium rotor reinforced with high-modulus Kevlar wrap to resist expansion past 60,000 RPM.',
     features: ['4-Pole Neodymium', 'Kevlar Wrapped', 'Dynamic Balance'],
     width: 140,
     height: 46,
@@ -132,13 +144,10 @@ const PARTS: MotorPart[] = [
     zIndex: 60,
     render: () => (
       <div className="w-full h-full relative flex items-center shadow-xl">
-         {/* Kevlar body */}
          <div className="w-[110px] h-full bg-gradient-to-b from-gray-900 via-gray-700 to-gray-950 rounded-sm border-y border-black overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-4 bg-white/10"></div>
-            {/* Kevlar pattern */}
-            <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #fff 2px, #fff 4px)' }}></div>
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #EAB308 2px, #EAB308 4px)' }}></div>
          </div>
-         {/* Rotor ends */}
          <div className="absolute left-0 w-2 h-full bg-gradient-to-b from-gray-400 to-gray-600"></div>
          <div className="absolute left-[108px] w-2 h-full bg-gradient-to-b from-gray-400 to-gray-600"></div>
       </div>
@@ -147,7 +156,7 @@ const PARTS: MotorPart[] = [
   {
     id: 'fan',
     name: 'Cooling Fan',
-    description: 'Integrated internal aluminum fan for enhanced airflow and temperature management. Forces air through the stator to dramatically reduce operating temps.',
+    description: 'Integrated internal aluminum turbine fan that forces fresh air directly across the stator coils to keep operating temperatures low.',
     features: ['Lightweight Aluminum', 'High-CFM Design', 'RPM Synchronized'],
     width: 14,
     height: 52,
@@ -155,9 +164,9 @@ const PARTS: MotorPart[] = [
     explodedX: 320,
     zIndex: 70,
     render: () => (
-      <div className="w-full h-full bg-gradient-to-b from-gray-200 via-white to-gray-400 rounded-[1px] flex flex-col justify-around py-0.5 shadow-md border border-gray-300">
+      <div className="w-full h-full bg-gradient-to-b from-yellow-200 via-white to-amber-300 rounded-[1px] flex flex-col justify-around py-0.5 shadow-md border border-yellow-500/50">
          {[...Array(6)].map((_, i) => (
-            <div key={i} className="w-full h-1 bg-gradient-to-r from-gray-400 to-gray-500 skew-y-12"></div>
+            <div key={i} className="w-full h-1 bg-gradient-to-r from-amber-400 to-yellow-500 skew-y-12"></div>
          ))}
       </div>
     )
@@ -173,7 +182,7 @@ const PARTS: MotorPart[] = [
     explodedX: 390,
     zIndex: 80,
     render: () => (
-      <div className="w-full h-full bg-gradient-to-b from-gray-300 via-white to-gray-500 rounded-sm border-x border-gray-400 flex items-center justify-center shadow-md">
+      <div className="w-full h-full bg-gradient-to-b from-gray-200 via-white to-gray-500 rounded-sm border-x border-gray-400 flex items-center justify-center shadow-md">
         <div className="w-4 h-full bg-gradient-to-b from-gray-400 via-gray-200 to-gray-600 border-x border-gray-500/50 rounded-[1px]"></div>
       </div>
     )
@@ -181,24 +190,22 @@ const PARTS: MotorPart[] = [
   {
     id: 'front-cover',
     name: 'Front Cover',
-    description: 'Red anodized aluminum front cover with optimized ventilation holes for improved cooling efficiency and precise bearing alignment.',
-    features: ['6061-T6 Aluminum', 'Ventilated Design', 'Red Anodized'],
-    width: 24,
+    description: 'Voltrix Electric Yellow anodized aluminum front bell with calibrated vortex ventilation ports for superior thermal exhaust.',
+    features: ['6061-T6 Aluminum', 'Ventilated Design', 'Electric Yellow Anodized'],
+    width: 26,
     height: 120,
     assembledX: 140,
     explodedX: 470,
     zIndex: 90,
     render: () => (
-      <div className="w-full h-full relative rounded-r-md overflow-hidden bg-gradient-to-b from-red-600 via-red-500 to-red-800 border-l border-red-900 shadow-[inset_-2px_0_4px_rgba(255,255,255,0.3),4px_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center">
-         <div className="w-16 h-16 rounded-full bg-black/90 flex items-center justify-center border-2 border-red-900/40 shadow-inner">
-             {/* Shaft hole */}
-             <div className="w-6 h-6 rounded-full bg-[#111] border border-gray-800 shadow-[inset_0_2px_4px_rgba(0,0,0,1)]"></div>
+      <div className="w-full h-full relative rounded-r-md overflow-hidden bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 border-l border-yellow-700 shadow-[inset_-2px_0_6px_rgba(255,255,255,0.6),4px_0_12px_rgba(0,0,0,0.5)] flex items-center justify-center">
+         <div className="w-16 h-16 rounded-full bg-black/90 flex items-center justify-center border-2 border-yellow-500/60 shadow-inner">
+             <div className="w-6 h-6 rounded-full bg-[#111] border border-yellow-600 shadow-[inset_0_2px_4px_rgba(0,0,0,1)]"></div>
          </div>
-         {/* Ventilation holes */}
-         <div className="absolute top-2 left-2 w-3.5 h-3.5 rounded-full bg-black/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
-         <div className="absolute bottom-2 left-2 w-3.5 h-3.5 rounded-full bg-black/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
-         <div className="absolute top-8 right-2 w-3.5 h-3.5 rounded-full bg-black/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
-         <div className="absolute bottom-8 right-2 w-3.5 h-3.5 rounded-full bg-black/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+         <div className="absolute top-2 left-2 w-3.5 h-3.5 rounded-full bg-black/85 shadow-[inset_0_2px_4px_rgba(0,0,0,0.9)] border border-yellow-700/50"></div>
+         <div className="absolute bottom-2 left-2 w-3.5 h-3.5 rounded-full bg-black/85 shadow-[inset_0_2px_4px_rgba(0,0,0,0.9)] border border-yellow-700/50"></div>
+         <div className="absolute top-8 right-2 w-3.5 h-3.5 rounded-full bg-black/85 shadow-[inset_0_2px_4px_rgba(0,0,0,0.9)] border border-yellow-700/50"></div>
+         <div className="absolute bottom-8 right-2 w-3.5 h-3.5 rounded-full bg-black/85 shadow-[inset_0_2px_4px_rgba(0,0,0,0.9)] border border-yellow-700/50"></div>
       </div>
     )
   },
@@ -210,11 +217,10 @@ const PARTS: MotorPart[] = [
     width: 220,
     height: 12,
     assembledX: 50,
-    explodedX: 200, // Shaft moves with the rotor
-    zIndex: 100, // Top layer so it sticks out over the front cover
+    explodedX: 200,
+    zIndex: 100,
     render: () => (
-      <div className="w-full h-full bg-gradient-to-b from-gray-300 via-white to-gray-500 rounded-r-full shadow-md border-y border-gray-400">
-         {/* Shaft highlight */}
+      <div className="w-full h-full bg-gradient-to-b from-gray-200 via-white to-gray-500 rounded-r-full shadow-md border-y border-gray-400 relative">
          <div className="absolute top-1 left-0 right-1 h-1 bg-white/70 rounded-r-full"></div>
       </div>
     )
@@ -224,8 +230,13 @@ const PARTS: MotorPart[] = [
 export function InteractiveViewer() {
   const [explodeRatio, setExplodeRatio] = useState(0);
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
+  const [viewAngle, setViewAngle] = useState<'iso' | 'front' | 'side' | 'rear' | 'top'>('iso');
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [renderMode, setRenderMode] = useState<'3d' | '2d'>('3d');
   
+  const { t, lang } = useApp();
   const selectedPart = PARTS.find(p => p.id === selectedPartId);
+  const translatedPart = selectedPartId ? partsTranslations[lang][selectedPartId as keyof typeof partsTranslations['en']] : null;
 
   return (
     <motion.div 
@@ -235,155 +246,296 @@ export function InteractiveViewer() {
       transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
       className="flex flex-col xl:flex-row gap-6 w-full h-full max-w-7xl mx-auto p-4 md:p-8"
     >
-      
-      {/* Viewer Area */}
-      <div className="flex-1 flex flex-col bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden relative min-h-[500px]">
-        {/* Interactive Canvas */}
-        <div 
-          className="flex-1 relative cursor-crosshair overflow-hidden"
-          onClick={(e) => {
-             // Clicked background
-             if (e.target === e.currentTarget) setSelectedPartId(null);
-          }}
-        >
-           {/* Background Grid */}
-           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-           
-           {/* Center Pivot */}
-           <div className="absolute top-1/2 left-1/2 -translate-y-1/2 scale-[0.4] sm:scale-[0.6] lg:scale-100 transition-transform origin-center">
-              <AnimatePresence>
-                {PARTS.map((part) => {
-                   const isSelected = selectedPartId === part.id;
-                   const isAnySelected = selectedPartId !== null;
-                   const currentX = part.assembledX + (part.explodedX - part.assembledX) * explodeRatio;
-                   
-                   return (
-                     <motion.div
-                       key={part.id}
-                       className="absolute top-1/2 -translate-y-1/2 cursor-pointer group"
-                       style={{ 
-                         width: part.width, 
-                         height: part.height,
-                         zIndex: isSelected ? 200 : part.zIndex 
-                       }}
-                       initial={false}
-                       animate={{ 
-                         x: currentX,
-                         opacity: isAnySelected && !isSelected ? 0.3 : 1,
-                         scale: isSelected ? 1.05 : 1,
-                         filter: isSelected ? 'drop-shadow(0 20px 30px rgba(255, 75, 18, 0.4))' : 'drop-shadow(0 0px 0px rgba(0,0,0,0))'
-                       }}
-                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setSelectedPartId(part.id);
-                       }}
-                     >
-                       {part.render()}
-                       
-                       {/* Label Tooltip (only when exploded enough and not selected) */}
-                       {explodeRatio > 0.3 && !isSelected && (
-                         <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: isAnySelected ? 0 : 1 }}
-                            className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-semibold text-gray-500 bg-white px-2 py-1 rounded shadow-sm border border-gray-100 pointer-events-none transition-opacity group-hover:text-[#FF4B12] group-hover:border-[#FF4B12]/30"
-                         >
-                           {part.name}
-                         </motion.div>
-                       )}
-                     </motion.div>
-                   )
-                })}
-              </AnimatePresence>
-           </div>
-           
-           {/* Instructions overlay */}
-           {explodeRatio === 0 && !selectedPartId && (
-              <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none animate-pulse opacity-60">
-                 <div className="text-sm font-semibold text-gray-400 bg-white/80 px-4 py-2 rounded-full shadow-sm border border-gray-100 backdrop-blur-sm">
-                   Drag slider to explode assembly
-                 </div>
+      {/* Viewer Main Stage Area */}
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 overflow-hidden relative min-h-[560px]">
+        
+        {/* Top Floating Control Bar */}
+        <div className="p-4 bg-gray-50/90 dark:bg-gray-900/90 border-b border-gray-100 dark:border-gray-800 backdrop-blur-md z-20 flex flex-wrap items-center justify-between gap-3">
+          
+          {/* Mode Switch: 3D Visual vs Blueprint */}
+          <div className="flex items-center gap-1.5 p-1 bg-gray-200/80 dark:bg-gray-800/80 rounded-xl">
+            <button
+              onClick={() => setRenderMode('3d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
+                renderMode === '3d'
+                  ? 'bg-yellow-500 text-black shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <Box size={14} />
+              <span>3D WebGL (Yellow)</span>
+            </button>
+            <button
+              onClick={() => setRenderMode('2d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
+                renderMode === '2d'
+                  ? 'bg-yellow-500 text-black shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <Layers size={14} />
+              <span>2D Blueprint</span>
+            </button>
+          </div>
+
+          {/* 3D Camera Angles & Auto-Rotate Controls */}
+          {renderMode === '3d' && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 hidden sm:inline mr-1">
+                {t('viewAngles')}:
+              </span>
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/90 p-1 rounded-xl">
+                {(['iso', 'front', 'side', 'rear', 'top'] as const).map((angle) => (
+                  <button
+                    key={angle}
+                    onClick={() => {
+                      setViewAngle(angle);
+                      setAutoRotate(false);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all ${
+                      viewAngle === angle
+                        ? 'bg-yellow-400 text-black font-black shadow-xs'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'
+                    }`}
+                  >
+                    {t(angle as any) || angle}
+                  </button>
+                ))}
               </div>
-           )}
+
+              {/* Auto Rotate Toggle */}
+              <button
+                onClick={() => setAutoRotate(!autoRotate)}
+                title={t('autoRotate')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                  autoRotate
+                    ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/40 shadow-xs'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent hover:border-gray-300 dark:hover:border-gray-700'
+                }`}
+              >
+                {autoRotate ? <Pause size={13} className="text-yellow-500 animate-spin" /> : <Play size={13} />}
+                <span className="hidden sm:inline">{t('autoRotate')}</span>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Controls */}
-        <div className="p-6 bg-gray-50/50 border-t border-gray-100 backdrop-blur-md z-10 flex flex-col gap-4">
+        {/* Interactive Canvas Area */}
+        <div className="flex-1 relative overflow-hidden min-h-[360px] md:min-h-[420px] bg-[#fbfbfb] dark:bg-[#0c0d10]">
+          
+          {/* Subtle Grid texture */}
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(250,204,21,0.06)_0%,transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(250,204,21,0.08)_0%,transparent_75%)]"></div>
+
+          {renderMode === '3d' ? (
+            <Motor3DCanvas
+              explodeRatio={explodeRatio}
+              selectedPartId={selectedPartId}
+              onSelectPart={(id) => setSelectedPartId(id)}
+              viewAngle={viewAngle}
+              autoRotate={autoRotate}
+            />
+          ) : (
+            /* 2D Schematic Interactive Canvas */
+            <div 
+              className="w-full h-full relative cursor-crosshair overflow-hidden flex items-center justify-center min-h-[400px]"
+              onClick={(e) => {
+                 if (e.target === e.currentTarget) setSelectedPartId(null);
+              }}
+            >
+               <div className="scale-[0.45] sm:scale-[0.65] lg:scale-100 transition-transform origin-center relative w-full h-full flex items-center justify-center">
+                  <AnimatePresence>
+                    {PARTS.map((part) => {
+                       const isSelected = selectedPartId === part.id;
+                       const isAnySelected = selectedPartId !== null;
+                       const currentX = part.assembledX + (part.explodedX - part.assembledX) * explodeRatio;
+                       
+                       return (
+                         <motion.div
+                           key={part.id}
+                           className="absolute top-1/2 -translate-y-1/2 cursor-pointer group"
+                           style={{ 
+                             width: part.width, 
+                             height: part.height,
+                             zIndex: isSelected ? 200 : part.zIndex 
+                           }}
+                           initial={false}
+                           animate={{ 
+                             x: currentX,
+                             opacity: isAnySelected && !isSelected ? 0.3 : 1,
+                             scale: isSelected ? 1.05 : 1,
+                             filter: isSelected ? 'drop-shadow(0 20px 30px rgba(234, 179, 8, 0.45))' : 'drop-shadow(0 0px 0px rgba(0,0,0,0))'
+                           }}
+                           transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             setSelectedPartId(part.id);
+                           }}
+                         >
+                           {part.render()}
+                           {explodeRatio > 0.3 && !isSelected && (
+                             <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: isAnySelected ? 0 : 1 }}
+                                className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-100 dark:border-gray-700 pointer-events-none transition-all group-hover:text-yellow-600 dark:group-hover:text-yellow-400 group-hover:border-yellow-400/50"
+                             >
+                               {part.name}
+                             </motion.div>
+                           )}
+                         </motion.div>
+                       );
+                    })}
+                  </AnimatePresence>
+               </div>
+            </div>
+          )}
+
+          {/* Interactive Hint Banner */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none z-10 transition-opacity">
+            <div className="text-[11px] md:text-xs font-bold text-yellow-800 dark:text-yellow-300 bg-yellow-400/15 dark:bg-yellow-950/80 px-4 py-1.5 rounded-full shadow-sm border border-yellow-500/30 backdrop-blur-md flex items-center gap-2">
+              <Compass size={14} className="text-yellow-500 animate-spin" />
+              <span>{t('rotateHint')}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Component Picker Strip */}
+        <div className="px-6 py-2.5 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 overflow-x-auto flex items-center gap-2 scrollbar-none">
+          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
+            {t('inspectComponents')}:
+          </span>
+          {PARTS.map((part) => {
+            const isSelected = selectedPartId === part.id;
+            return (
+              <button
+                key={part.id}
+                onClick={() => setSelectedPartId(isSelected ? null : part.id)}
+                className={`text-xs px-3 py-1 rounded-full transition-all shrink-0 font-medium ${
+                  isSelected
+                    ? 'bg-yellow-500 text-black font-black shadow-sm scale-105'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white border border-gray-200 dark:border-gray-700'
+                }`}
+              >
+                {part.name}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Exploded View Slider & Controls */}
+        <div className="p-6 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-10 flex flex-col gap-4">
            <div className="flex justify-between items-center px-1">
-             <span className="text-sm font-bold text-gray-700">Assembled</span>
-             <span className="text-sm font-bold text-[#FF4B12]">Exploded View</span>
+             <div className="flex items-center gap-2">
+               <Sliders size={16} className="text-yellow-500" />
+               <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('assembled')} (0%)</span>
+             </div>
+             
+             {/* Quick Actions: Assemble vs Explode */}
+             <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setExplodeRatio(0)}
+                  className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
+                    explodeRatio === 0
+                      ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border border-yellow-500/40'
+                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t('assemble')}
+                </button>
+                <button
+                  onClick={() => setExplodeRatio(1)}
+                  className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
+                    explodeRatio === 1
+                      ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border border-yellow-500/40'
+                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t('explode')}
+                </button>
+                <span className="text-sm font-black text-yellow-600 dark:text-yellow-400 ml-2">
+                  {Math.round(explodeRatio * 100)}%
+                </span>
+             </div>
            </div>
+
            <input
              type="range"
              min="0"
              max="100"
              value={explodeRatio * 100}
              onChange={(e) => setExplodeRatio(Number(e.target.value) / 100)}
-             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF4B12] focus:outline-none focus:ring-2 focus:ring-[#FF4B12]/50"
+             className="w-full h-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
            />
-           <div className="flex justify-center mt-2">
+
+           <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-1">
+              <span>{t('dragHint')}</span>
               <button 
                 onClick={() => {
                   setExplodeRatio(0);
                   setSelectedPartId(null);
+                  setViewAngle('iso');
+                  setAutoRotate(false);
                 }}
-                className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors px-4 py-2 rounded-full hover:bg-gray-100"
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors px-3 py-1 rounded-full hover:bg-yellow-50 dark:hover:bg-yellow-950/40"
               >
-                 <RotateCcw size={16} />
-                 Reset View
+                 <RotateCcw size={13} />
+                 <span>{t('resetView')}</span>
               </button>
            </div>
         </div>
       </div>
 
-      {/* Part Info Panel */}
+      {/* Part Info & Inspection Panel */}
       <div className="w-full xl:w-96 flex flex-col shrink-0">
         <AnimatePresence mode="wait">
-          {selectedPart ? (
+          {selectedPart && translatedPart ? (
             <motion.div
               key="part-info"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#FF4B12]/20 relative overflow-hidden flex-1"
+              className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-yellow-500/30 relative overflow-hidden flex-1 flex flex-col justify-between"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF4B12]/5 rounded-bl-full -z-10"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-bl-full -z-10"></div>
               
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#FF4B12] mb-1 block">Component Isolated</span>
-                  <h2 className="text-2xl font-black text-gray-900">{selectedPart.name}</h2>
+              <div>
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-yellow-600 dark:text-yellow-400 mb-1 block">
+                      {t('componentIsolated')}
+                    </span>
+                    <h2 className="text-2xl font-black text-gray-900 dark:text-white">{translatedPart.name}</h2>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedPartId(null)}
+                    className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  >
+                    <Search size={18} />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setSelectedPartId(null)}
-                  className="p-2 text-gray-400 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <Search size={20} />
-                </button>
+                
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8 text-sm">
+                  {translatedPart.description}
+                </p>
+                
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <ChevronRight size={16} className="text-yellow-500" />
+                    {t('keySpecs')}
+                  </h4>
+                  <ul className="space-y-3">
+                    {translatedPart.features.map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                         <div className="w-2 h-2 rounded-full bg-yellow-500 shrink-0"></div>
+                         {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
               
-              <p className="text-gray-600 leading-relaxed mb-8 text-sm">
-                {selectedPart.description}
-              </p>
-              
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                  <ChevronRight size={16} className="text-[#FF4B12]" />
-                  Key Specifications
-                </h4>
-                <ul className="space-y-3">
-                  {selectedPart.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 px-4 py-2.5 rounded-lg border border-gray-100">
-                       <div className="w-1.5 h-1.5 rounded-full bg-[#FF4B12]"></div>
-                       {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3 text-xs text-gray-400">
+              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3 text-xs text-gray-400">
                 <Info size={14} />
-                <span>Interaction: Click background to deselect</span>
+                <span>{t('interactionHint')}</span>
               </div>
             </motion.div>
           ) : (
@@ -392,15 +544,26 @@ export function InteractiveViewer() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-gray-50 rounded-3xl p-8 border border-gray-100 border-dashed flex flex-col items-center justify-center text-center flex-1 min-h-[300px]"
+              className="bg-gray-50 dark:bg-gray-900/50 rounded-3xl p-8 border border-gray-200 dark:border-gray-800 border-dashed flex flex-col items-center justify-center text-center flex-1 min-h-[320px]"
             >
-              <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-[#FF4B12] mb-4">
-                <Search size={24} />
+              <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 dark:bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 flex items-center justify-center mb-4">
+                <Box size={28} />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Inspect Components</h3>
-              <p className="text-sm text-gray-500 max-w-[200px]">
-                Click on any component in the assembly view to isolate it and view detailed technical specifications.
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('inspectComponents')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-[240px]">
+                {t('inspectDesc')}
               </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-1.5">
+                {PARTS.slice(0, 4).map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedPartId(p.id)}
+                    className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-yellow-500 px-2.5 py-1 rounded-full text-gray-600 dark:text-gray-400 hover:text-yellow-600 transition-colors"
+                  >
+                    {p.name}
+                  </button>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -409,3 +572,4 @@ export function InteractiveViewer() {
     </motion.div>
   );
 }
+

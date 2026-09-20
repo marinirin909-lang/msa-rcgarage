@@ -1,6 +1,6 @@
 {
-  "name": "MSA RcGarage Explorer",
-  "description": "Interactive exploded-view visualization of the MSA Competition-Grade Brushless Motor.",
+  "name": "VOLTRIX - RC Brushless Motor",
+  "description": "Siri motor RC brushless berprestasi tinggi VOLTRIX: Spark, Storm, Apex & Black Edition. Power You Can Feel.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
